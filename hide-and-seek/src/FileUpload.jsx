@@ -1,24 +1,39 @@
 import axios from 'axios';
 import React, { useState } from 'react'; 
+import { Container, Form, Header, Segment } from 'semantic-ui-react';
 
 
 export default function FileUpload() { 
 
-    const [state, setState] = useState({selectedFile: null}); 
-    const [formData, setFormData] = useState(new FormData());
-    const onFileChange = event => { 
-      setState({ selectedFile: event.target.files[0] }); 
-    }; 
-    const responseBody =  (response) => response.data;
+    const [state, setState] = useState({selectedFile: null});
+    const [key, setKey] = useState('');
+    
+    const onChangeKey = (event) => {
+        setKey(event.target.value);
+        console.log(key);
+    }
+    const onFileChange = (event) => { 
+      setState({ selectedFile: event.target.files[0] });
+    };
+    const options = [
+        {key: 'encrypt', text:'Encrypt', value: 'encrypt'},
+        {key: 'decrypt', text:'Decrypt', value:'decrypt'}
+    ]
+    
     const onFileUpload = async (e) => {
-      setFormData(new FormData());
+      const formData = new FormData();
+    
       formData.append( 
-        "myFile",
+        "file",
         state.selectedFile, 
         state.selectedFile.name 
       );
+      formData.append(
+          "key",
+          key
+      )
       try{
-          const res = await axios({method:"POST", url:"https://localhost:7277/api/file", 
+          const res = await axios({method:"POST", url:"https://localhost:7277/api/file/import", 
           data: formData,
           headers: { "Access-Control-Allow-Origin": "*" }
         });
@@ -26,7 +41,6 @@ export default function FileUpload() {
       }
       catch(ex) {
           console.log(ex);
-          console.log("eroare aici");
       }
        
     };
@@ -35,36 +49,42 @@ export default function FileUpload() {
       if (state.selectedFile) { 
           
         return ( 
-          <div> 
-            <h2>File Details:</h2> 
+          <Container> 
+            <Header>File Details:</Header> 
             <p>File Name: {state.selectedFile.name}</p> 
             <p>File Type: {state.selectedFile.type}</p> 
             <p> 
               Last Modified:{" "} 
               {state.selectedFile.lastModifiedDate.toDateString()} 
             </p> 
-          </div> 
+          </Container> 
         ); 
       } else { 
         return ( 
-          <div> 
+          <Container> 
             <br /> 
             <h4>Choose before Pressing the Upload button</h4> 
-          </div> 
+          </Container> 
         ); 
       } 
     }; 
      
       return ( 
-        <div> 
-            <div> 
-                <input type="file" onChange={onFileChange} /> 
-                <button onClick={onFileUpload}> 
+        <Container> 
+            <Segment>
+                <Form>
+                    <Form.Input fluid type='file' onChange={onFileChange}/>
+                    <Form.Input label='Key' value={key} onChange={onChangeKey} />
+                    <Form.Button onClick={onFileUpload}>Upload</Form.Button>
+                </Form>
+                {/* <input className="ui icon button" type="file" onChange={onFileChange} /> */}
+                
+                {/* <Button primary onClick={onFileUpload}> 
                   Upload! 
-                </button> 
-            </div> 
+                </Button>  */}
+            </Segment> 
           {fileData()} 
-        </div> 
+        </Container> 
       ); 
     
   } 

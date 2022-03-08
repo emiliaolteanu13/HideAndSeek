@@ -18,17 +18,19 @@ namespace HideAndSeek.API.Controllers
         //    return "value";
         //}
 
-        [HttpPost]
-        public ActionResult Post([FromForm] FormFile file)
+        [HttpPost("import")]
+        public IActionResult ImportFile([FromForm] IFormFile file, [FromForm] string key)
         {
-            try
+            string name = file.FileName;
+            string extension = Path.GetExtension(file.FileName);
+            byte[] fileToBytes;
+            using (var memoryStream = new MemoryStream())
             {
-                return StatusCode(StatusCodes.Status201Created);
+                file.CopyTo(memoryStream);
+                fileToBytes = memoryStream.ToArray();
+                extension += ".enc";
             }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return Ok(fileToBytes);
         }
 
     }
