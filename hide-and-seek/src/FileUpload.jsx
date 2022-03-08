@@ -7,20 +7,19 @@ export default function FileUpload() {
 
     const [state, setState] = useState({selectedFile: null});
     const [key, setKey] = useState('');
+    const [operation, setOperation] = useState('');
     
     const onChangeKey = (event) => {
         setKey(event.target.value);
-        console.log(key);
     }
     const onFileChange = (event) => { 
       setState({ selectedFile: event.target.files[0] });
     };
-    const options = [
-        {key: 'encrypt', text:'Encrypt', value: 'encrypt'},
-        {key: 'decrypt', text:'Decrypt', value:'decrypt'}
-    ]
+    const onChangeOperation = (event) => {
+        setOperation(event.target.innerText);
+    }
     
-    const onFileUpload = async (e) => {
+    const onFileUpload = async (event) => {
       const formData = new FormData();
     
       formData.append( 
@@ -31,6 +30,10 @@ export default function FileUpload() {
       formData.append(
           "key",
           key
+      )
+      formData.append(
+          "operation",
+          operation
       )
       try{
           const res = await axios({method:"POST", url:"https://localhost:7277/api/file/import", 
@@ -44,7 +47,7 @@ export default function FileUpload() {
       }
        
     };
- 
+    
     const fileData = () => { 
       if (state.selectedFile) { 
           
@@ -75,6 +78,13 @@ export default function FileUpload() {
                 <Form>
                     <Form.Input fluid type='file' onChange={onFileChange}/>
                     <Form.Input label='Key' value={key} onChange={onChangeKey} />
+                    <Form.Group>
+                        <label>Encrypt or Decrypt?</label>
+                            <Form.Radio label='encrypt' operation='encrypt' checked={operation === 'encrypt'} onChange={onChangeOperation} />
+                      
+                            <Form.Radio label='decrypt' operation='decrypt' checked={operation === 'decrypt'} onChange={onChangeOperation} />   
+            
+                    </Form.Group>
                     <Form.Button onClick={onFileUpload}>Upload</Form.Button>
                 </Form>
                 {/* <input className="ui icon button" type="file" onChange={onFileChange} /> */}

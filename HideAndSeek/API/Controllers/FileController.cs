@@ -19,7 +19,7 @@ namespace HideAndSeek.API.Controllers
         //}
 
         [HttpPost("import")]
-        public IActionResult ImportFile([FromForm] IFormFile file, [FromForm] string key)
+        public IActionResult ImportFile([FromForm] IFormFile file, [FromForm] string key, [FromForm] string operation)
         {
             string name = file.FileName;
             string extension = Path.GetExtension(file.FileName);
