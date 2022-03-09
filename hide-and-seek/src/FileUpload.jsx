@@ -1,12 +1,14 @@
 import axios from 'axios';
 import React, { useState } from 'react'; 
 import { Container, Form, Header, Segment } from 'semantic-ui-react';
+import FileDownload from './FileDownload';
 
 
 export default function FileUpload() { 
 
     const [state, setState] = useState({selectedFile: null});
     const [key, setKey] = useState('');
+    const [flag, setFlag] = useState(false);
     const [operation, setOperation] = useState('');
     
     const onChangeKey = (event) => {
@@ -39,8 +41,9 @@ export default function FileUpload() {
           const res = await axios({method:"POST", url:"https://localhost:7277/api/file", 
           data: formData,
           headers: { "Access-Control-Allow-Origin": "*" }
+          
         });
-          console.log(res);
+          setFlag(true);
       }
       catch(ex) {
           console.log(ex);
@@ -93,7 +96,8 @@ export default function FileUpload() {
                   Upload! 
                 </Button>  */}
             </Segment> 
-          {fileData()} 
+          {fileData()}
+          {flag && <FileDownload/>}
         </Container> 
       ); 
     

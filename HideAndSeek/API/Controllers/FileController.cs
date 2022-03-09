@@ -9,7 +9,7 @@ namespace HideAndSeek.API.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("download")]
         public IActionResult SendFile()
         {
             //return File(System.IO.File.ReadAllBytes(Directory.GetFiles(@".\EncryptedDataStore")[0]), "application/octet-stream", Path.GetFileName(Directory.GetFiles(@".\EncryptedDataStore")[0]));

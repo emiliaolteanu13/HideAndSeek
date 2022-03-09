@@ -1,3 +1,5 @@
+using Microsoft.Extensions.FileProviders;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -26,6 +28,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseFileServer(new FileServerOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        System.IO.Path.Combine(@"C:\Users\HP\Documents\HideAndSeek\hide-and-seek\", "Public")),
+    RequestPath = "",
+    EnableDefaultFiles = true
+});
 app.UseHttpsRedirection();
 
 
@@ -36,22 +45,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-
-
-//app.UseEndpoints(endpoints =>
-//{
-    
-//    endpoints.MapGet("/echo",
-//        context => context.Response.WriteAsync("echo"))
-//        .RequireCors(MyAllowSpecificOrigins);
-
-//    endpoints.MapControllers()
-//             .RequireCors(MyAllowSpecificOrigins);
-
-//    endpoints.MapGet("/echo2",
-//        context => context.Response.WriteAsync("echo2"));
-
-//});
 
 app.Run();
