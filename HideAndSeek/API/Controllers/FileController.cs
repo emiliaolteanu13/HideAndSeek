@@ -9,8 +9,24 @@ namespace HideAndSeek.API.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
-        [HttpPost("import")]
-        public IActionResult ImportFile([FromForm] IFormFile file, [FromForm] string key, [FromForm] string operation)
+        [HttpGet]
+        public IActionResult SendFile()
+        {
+            //return File(System.IO.File.ReadAllBytes(Directory.GetFiles(@".\EncryptedDataStore")[0]), "application/octet-stream", Path.GetFileName(Directory.GetFiles(@".\EncryptedDataStore")[0]));
+            var files = Directory.GetFiles(@".\EncryptedDataStore");
+            var data = System.IO.File.ReadAllBytes(files[0]);
+            var fileName = Path.GetFileName(files[0]);
+            
+            var result = new FileContentResult(data, "application/octet-stream")
+            {
+                FileDownloadName = fileName,
+            };
+            System.IO.File.Delete(files[0]);
+            return result;
+        }
+
+        [HttpPost]
+        public IActionResult UploadFile([FromForm] IFormFile file, [FromForm] string key, [FromForm] string operation)
         {
             string name = file.FileName;
             string extension = Regex.Match(name, @"\..*").Value;
@@ -26,7 +42,6 @@ namespace HideAndSeek.API.Controllers
                     extension += ".enc";
                 else
                 {
-                    int n = extension.Split('.').Length;
                     if (extension.Split('.').Length > 2)
                         extension = extension.Replace(".enc", "");
                     else

@@ -36,7 +36,7 @@ export default function FileUpload() {
           operation
       )
       try{
-          const res = await axios({method:"POST", url:"https://localhost:7277/api/file/import", 
+          const res = await axios({method:"POST", url:"https://localhost:7277/api/file", 
           data: formData,
           headers: { "Access-Control-Allow-Origin": "*" }
         });
