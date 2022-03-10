@@ -5,9 +5,9 @@ import FileUpload from './FileUpload';
 function App() {
   return (
     <div className="App">
-      <Header size='huge'>
-       Hide and Seek
-      </Header>
+      <div class="app-title">
+        <h1>Hide And Seek<span>Encrypt or decrypt your files</span></h1>
+      </div>
       <Container>
         <FileUpload/>
       </Container>
