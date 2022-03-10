@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react'; 
-import { Container, Form, Header, Segment } from 'semantic-ui-react';
+import { Button, Card, Container, Form, Header, Icon, Progress, Segment } from 'semantic-ui-react';
 import FileDownload from './FileDownload';
 
 
@@ -10,6 +10,7 @@ export default function FileUpload() {
     const [key, setKey] = useState('');
     const [flag, setFlag] = useState(false);
     const [operation, setOperation] = useState('');
+    const [statusCode, setStatusCode] = useState('');
     
     const onChangeKey = (event) => {
         setKey(event.target.value);
@@ -38,10 +39,12 @@ export default function FileUpload() {
           operation
       )
       try{
-          const res = await axios({method:"POST", url:"https://localhost:7277/api/file", 
+          await axios({method:"POST", url:"https://localhost:7277/api/file", 
           data: formData,
           headers: { "Access-Control-Allow-Origin": "*" }
           
+        }).then(response => {
+          setStatusCode(response.status)
         });
           setFlag(true);
       }
@@ -55,7 +58,7 @@ export default function FileUpload() {
       if (state.selectedFile) { 
           
         return ( 
-          <Container> 
+          <Segment> 
             <Header>File Details:</Header> 
             <p>File Name: {state.selectedFile.name}</p> 
             <p>File Type: {state.selectedFile.type}</p> 
@@ -63,13 +66,12 @@ export default function FileUpload() {
               Last Modified:{" "} 
               {state.selectedFile.lastModifiedDate.toDateString()} 
             </p> 
-          </Container> 
+          </Segment> 
         ); 
       } else { 
         return ( 
           <Container> 
-            <br /> 
-            <h4>Choose before Pressing the Upload button</h4> 
+            <h4 style={{color:'red'}}>Choose before Pressing the Upload button</h4> 
           </Container> 
         ); 
       } 
@@ -79,7 +81,33 @@ export default function FileUpload() {
         <Container> 
             <Segment>
                 <Form>
-                    <Form.Input fluid type='file' onChange={onFileChange}/>
+                <Form.Field>
+                <label>File input & upload </label>
+                <Button as="label" htmlFor="file" type="button" animated="fade">
+                  <Button.Content visible>
+                    <Icon name="file" />
+                  </Button.Content>
+                  <Button.Content hidden>Choose a File</Button.Content>
+                </Button>
+                <input
+                  type="file"
+                  id="file"
+                  hidden
+                  onChange={onFileChange}
+                />
+                {state.selectedFile &&
+                <Form.Input
+                fluid
+                label="File Chosen: "
+                placeholder="Use the above bar to browse your file system"
+                readOnly
+                value={state.selectedFile.name}
+                
+              />
+                }
+                </Form.Field>
+                
+                    
                     <Form.Input label='Key' value={key} onChange={onChangeKey} />
                     <Form.Group>
                         <label>Encrypt or Decrypt?</label>
@@ -88,13 +116,33 @@ export default function FileUpload() {
                             <Form.Radio label='decrypt' operation='decrypt' checked={operation === 'decrypt'} onChange={onChangeOperation} />   
             
                     </Form.Group>
+                    {state.selectedFile && operation && key &&
                     <Form.Button onClick={onFileUpload}>Upload</Form.Button>
+                    }
+                    
+                   
+                {statusCode && statusCode === 200 ? (
+                  <Progress
+                    style={{ marginTop: "20px" }}
+                    percent={100}
+                    success
+                    progress
+                  >
+                    File Upload Success
+                  </Progress>
+                ) : statusCode && statusCode === 500 ? (
+                  <Progress
+                    style={{ marginTop: "20px" }}
+                    percent={100}
+                    error
+                    active
+                    progress
+                  >
+                    File Upload Failed
+                  </Progress>
+                ) : null}
                 </Form>
-                {/* <input className="ui icon button" type="file" onChange={onFileChange} /> */}
                 
-                {/* <Button primary onClick={onFileUpload}> 
-                  Upload! 
-                </Button>  */}
             </Segment> 
           {fileData()}
           {flag && <FileDownload/>}

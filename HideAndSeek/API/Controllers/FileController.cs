@@ -21,13 +21,17 @@ namespace HideAndSeek.API.Controllers
             {
                 FileDownloadName = fileName,
             };
-            System.IO.File.Delete(files[0]);
             return result;
         }
 
         [HttpPost]
         public IActionResult UploadFile([FromForm] IFormFile file, [FromForm] string key, [FromForm] string operation)
         {
+            var files = Directory.GetFiles(@".\EncryptedDataStore");
+            foreach(var f in files)
+            {
+                System.IO.File.Delete(f);
+            }
             string name = file.FileName;
             string extension = Regex.Match(name, @"\..*").Value;
             string fileName = name.Replace(extension, "");
