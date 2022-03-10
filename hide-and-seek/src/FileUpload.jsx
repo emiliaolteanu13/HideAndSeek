@@ -19,8 +19,16 @@ export default function FileUpload() {
       setState({ selectedFile: event.target.files[0] });
     };
     const onChangeOperation = (event) => {
-        setOperation(event.target.innerText);
+      setOperation(event.target.innerText);
     }
+    const onChangeAddCrc = (event) => {
+      if(event.target.checked) {
+        setOperation('decryptCRC');
+      }
+      else {
+        setOperation('decrypt');
+      }
+    };
     
     const onFileUpload = async (event) => {
       const formData = new FormData();
@@ -71,7 +79,7 @@ export default function FileUpload() {
       } else { 
         return ( 
           <Container> 
-            <h4 style={{color:'red'}}>Choose before Pressing the Upload button</h4> 
+            <h4>Choose before Pressing the Upload button</h4> 
           </Container> 
         ); 
       } 
@@ -82,7 +90,7 @@ export default function FileUpload() {
             <Segment>
                 <Form>
                 <Form.Field>
-                <label>File input & upload </label>
+                <label> Choose a file </label>
                 <Button as="label" htmlFor="file" type="button" animated="fade">
                   <Button.Content visible>
                     <Icon name="file" />
@@ -109,13 +117,16 @@ export default function FileUpload() {
                 
                     
                     <Form.Input label='Key' value={key} onChange={onChangeKey} />
-                    <Form.Group>
+                    <Form.Group style={{justifyContent: "center"}}>
                         <label>Encrypt or Decrypt?</label>
                             <Form.Radio label='encrypt' operation='encrypt' checked={operation === 'encrypt'} onChange={onChangeOperation} />
                       
                             <Form.Radio label='decrypt' operation='decrypt' checked={operation === 'decrypt'} onChange={onChangeOperation} />   
-            
+                  
                     </Form.Group>
+                    {operation ==='decrypt' &&
+                      <Form.Checkbox label='Add CRC' onChange={onChangeAddCrc}/>
+                    }
                     {state.selectedFile && operation && key &&
                     <Form.Button onClick={onFileUpload}>Upload</Form.Button>
                     }

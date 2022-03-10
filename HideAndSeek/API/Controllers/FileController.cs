@@ -12,16 +12,12 @@ namespace HideAndSeek.API.Controllers
         [HttpGet("download")]
         public IActionResult SendFile()
         {
-            //return File(System.IO.File.ReadAllBytes(Directory.GetFiles(@".\EncryptedDataStore")[0]), "application/octet-stream", Path.GetFileName(Directory.GetFiles(@".\EncryptedDataStore")[0]));
-            var files = Directory.GetFiles(@".\EncryptedDataStore");
-            var data = System.IO.File.ReadAllBytes(files[0]);
-            var fileName = Path.GetFileName(files[0]);
+            return File(System.IO.File.ReadAllBytes(
+                Directory.GetFiles(@".\EncryptedDataStore")[0]), 
+                "application/octet-stream", 
+                Path.GetFileName(Directory.GetFiles(@".\EncryptedDataStore")[0])
+                );
             
-            var result = new FileContentResult(data, "application/octet-stream")
-            {
-                FileDownloadName = fileName,
-            };
-            return result;
         }
 
         [HttpPost]
@@ -52,7 +48,17 @@ namespace HideAndSeek.API.Controllers
                         extension += ".dec";
                 }
             }
+
             byte[] encryptedDataBytes = Cryptographer.EncryptDecrypt(fileToBytes, keyToBytes);
+            if(operation=="decryptCRC")
+            {
+                var crc = CRC.CalculateBuffer(encryptedDataBytes);
+                foreach(byte b in crc)
+                {
+                    encryptedDataBytes.Append(b);
+                }
+            }
+                
             string folderName = @".\EncryptedDataStore";
             fileName += extension;
             string pathString = System.IO.Path.Combine(folderName, fileName);
