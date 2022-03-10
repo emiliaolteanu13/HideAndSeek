@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react'; 
-import { Button, Card, Container, Form, Header, Icon, Progress, Segment } from 'semantic-ui-react';
+import { Button, Container, Form, Header, Icon, Progress, Segment } from 'semantic-ui-react';
 import FileDownload from './FileDownload';
 
 
@@ -17,18 +17,18 @@ export default function FileUpload() {
     }
     const onFileChange = (event) => { 
       setState({ selectedFile: event.target.files[0] });
+      setStatusCode('');
     };
     const onChangeOperation = (event) => {
       setOperation(event.target.innerText);
     }
-    const onChangeAddCrc = (event) => {
-      if(event.target.checked) {
-        setOperation('decryptCRC');
-      }
-      else {
-        setOperation('decrypt');
-      }
+    const onChangeAddCrc = () => {
+      operation === 'encrypt' ? setOperation('encryptCRC'): setOperation('encrypt');
     };
+    const isHex = (inputKey) =>{
+      var a = parseInt(inputKey,16);
+      return (a.toString(16) === inputKey)
+    }
     
     const onFileUpload = async (event) => {
       const formData = new FormData();
@@ -117,17 +117,18 @@ export default function FileUpload() {
                 
                     
                     <Form.Input label='Key' value={key} onChange={onChangeKey} />
+                    {!isHex(key) && key.length>0 && <span style={{color: 'red'}}>Key must be hex</span>}
                     <Form.Group style={{justifyContent: "center"}}>
                         <label>Encrypt or Decrypt?</label>
-                            <Form.Radio label='encrypt' operation='encrypt' checked={operation === 'encrypt'} onChange={onChangeOperation} />
+                            <Form.Radio label='encrypt' operation='encrypt' checked={operation === 'encrypt' || operation === 'encryptCRC'} onChange={onChangeOperation} />
                       
                             <Form.Radio label='decrypt' operation='decrypt' checked={operation === 'decrypt'} onChange={onChangeOperation} />   
                   
                     </Form.Group>
-                    {operation ==='decrypt' &&
+                    {(operation ==='encrypt' || operation ==='encryptCRC') &&
                       <Form.Checkbox label='Add CRC' onChange={onChangeAddCrc}/>
                     }
-                    {state.selectedFile && operation && key &&
+                    {state.selectedFile && operation && key && isHex(key) &&
                     <Form.Button onClick={onFileUpload}>Upload</Form.Button>
                     }
                     

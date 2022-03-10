@@ -38,7 +38,7 @@ namespace HideAndSeek.API.Controllers
                 file.CopyTo(memoryStream);
 
                 fileToBytes = memoryStream.ToArray();
-                if(operation=="encrypt")
+                if(operation=="encrypt" || operation == "encryptCRC")
                     extension += ".enc";
                 else
                 {
@@ -50,9 +50,9 @@ namespace HideAndSeek.API.Controllers
             }
 
             byte[] encryptedDataBytes = Cryptographer.EncryptDecrypt(fileToBytes, keyToBytes);
-            if(operation=="decryptCRC")
+            if(operation=="encryptCRC")
             {
-                var crc = CRC.CalculateBuffer(encryptedDataBytes);
+                var crc = CRC.ComputeChecksumBytes(encryptedDataBytes);
                 foreach(byte b in crc)
                 {
                     encryptedDataBytes.Append(b);
